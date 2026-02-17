@@ -58,7 +58,7 @@ Kuģu vadīšanu kontrolē lietotājs. Vadība tiek īstenota, izmantojot tastat
 | 17.02.2026 - 23.02.2026 | GPS moduļa darbība |
 | 24.02.2026 - 02.03.2026 | UART savienojums starp Arduino un ESP32 |
 | 03.03.2026 - 09.03.2026 | Datu pārveršana par JSON, POST vaicājums uz datubāzi |
-| 10.03.2026 - 16.03.2026 | Frontend |
+| 10.03.2026 - 16.03.2026 | Mājaslapas izveide, dizaina noformēšana |
 | 17.03.2026 - 23.03.2026 | FastAPI vaicājumi, datubāzes izveide |
 | 24.03.2026 - 30.03.2026 | ESP32 komunikācija ar datubāzi |
 | 31.03.2026 - 06.04.2026 | Kameras moduļa darbība |
