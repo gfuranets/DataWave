@@ -24,4 +24,3 @@ while True:
         ser.write(b'S')
         print("Sent: S (center)")
         time.sleep(0.1)
-
