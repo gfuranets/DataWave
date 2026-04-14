@@ -1,13 +1,29 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from datetime import datetime
 
-class SensorData(BaseModel):
-    temperature: float #= Field(..., description = "T")
-    pressure: float #= Field(..., description = "P")
-    humidity: float #= Field(..., description = "Humidity")
-    magX: float #= Field(..., description = "X")
-    magY: float #= Field(..., description = "Y")
-    magZ: float #= Field(..., description = "Z")
-    timestamp: str #= Field(..., description = "Time of measurement")
+class User(BaseModel):
+    user_id: int
+    username: str
+    email: str
 
-class CreateSensorData(SensorData):
-    pass
+
+class CreateUser(BaseModel):
+    username: str
+    email: str
+
+
+class ChangeUser(BaseModel):
+    username: str | None = None
+    email: str | None = None
+
+
+class Data(BaseModel):
+    data_id: int
+    ship_id_refer: int
+    region_id_refer: int
+    data: str
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+

@@ -1,16 +1,25 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from config import SQLALCHEMY_DATABASE_URL
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
+user = "root"
+password = "root"
+host = "127.0.0.1"
+port = 3306
+database = "DataWave"
+DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"
+
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(
+                bind = engine,
+                autocommit = False,
+                autoflush = False)
+
 Base = declarative_base()
 
-# Dependency for FastAPI
 def get_db():
     db = SessionLocal()
     try:
         yield db
-    finally:
+    finally: 
         db.close()
