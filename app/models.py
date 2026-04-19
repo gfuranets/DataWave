@@ -18,8 +18,8 @@ class Ship(Base):
     name = Column(String(50), unique = True, nullable = False)
 
 
-class ShipData(Base):    
-    __tablename__ = "shipdata"
+class Data(Base):    
+    __tablename__ = "data"
 
     data_id = Column(Integer, primary_key = True, autoincrement = True)
     ship_id_refer = Column(Integer, ForeignKey("ship.ship_id"))

@@ -1,25 +1,12 @@
-{% extends "base.html" %}
+{% extends "base_signed.html" %}
+
 {% block content %}
-<h1>Data</h1>
-<div class="card">
-    <p>Below is the latest data from the database:</p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr>
-                <td>{{ row.id }}</td>
-                <td>{{ row.name }}</td>
-                <td>{{ row.value }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+
+<p>Data</p>
+
+{% for d in data %} 
+    <p>{{ d.user_id }} : {{ d.username }} / {{ d.email }} </p>
+    <br>
+{% endfor %}
+
 {% endblock %}

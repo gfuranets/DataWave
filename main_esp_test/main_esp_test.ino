@@ -2,17 +2,18 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 
-#define BME280_ADDR 0x76
-#define SDA 25
+#define BME280_ADDRESS 0x76
+#define QMC5883P_ADDRESS 0x2C
+#define SDA 27
 #define SCL 26
 
-const int QMC5883P_ADDRESS = 0x2C;
 // Register addresses for the QMC5883P
 const int MODE_REGISTER = 0x0A;
 const int CONFIG_REGISTER = 0x0B;
 const int X_LSB_REGISTER = 0x01;
 const int STATUS_REGISTER = 0x09;
 
+// Define a BME280 instance
 Adafruit_BME280 bme;
 
 // Setup functions
@@ -37,7 +38,7 @@ void loop() {
 // ---------------------------------------------------------------------------------------------------- //
 
 void setup_BME280() {
-  if (!bme.begin(BME280_ADDR)) {
+  if (!bme.begin(BME280_ADDRESS)) {
     Serial.println("Sensor not found!");
     while (true);
   }

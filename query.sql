@@ -15,7 +15,7 @@ CREATE TABLE ship (
     CONSTRAINT fk_user FOREIGN KEY (user_id_refer) REFERENCES user(user_id)
 );
 
-CREATE TABLE shipdata (
+CREATE TABLE data (
     data_id INT AUTO_INCREMENT PRIMARY KEY,
     ship_id_refer INT,
     data VARCHAR(40),

@@ -2,35 +2,52 @@ from sqlalchemy.orm import Session
 import models, schemas
 import datetime
 
-def get_all_users(db: Session):
-    return db.query(models.User).all()
-
-
-def create_user(user: schemas.CreateUser, db: Session):
-    new_user = models.User(username=user.username, email=user.email)
-    db.add(new_user)
+def signup(user: schemas.CreateUser, db: Session):
+    db_user = models.User(username = user.username,
+                          email = user.email)
+    
+    db.add(db_user)
     db.commit()
-    db.refresh(new_user)
-    return new_user
+    db.refresh(db_user)
 
-def post_data(data: schemas.Data, db: Session):
-    # Fixed: timestap -> timestamp
-    # Fixed: ship_id_refer was being used for region_id_refer
-    db_data = models.ShipData(
-        ship_id_refer = data.ship_id_refer,
-        region_id_refer = data.region_id_refer,
-        data = data.data,
-        timestamp = data.timestamp
-    )
+
+def login():
+    pass
+
+
+def delete_user(user_id: int, db: Session):
+    db_user = db.query(models.User).filter(user_id == user_id).first()
+
+    db.delete(db_user)
+    db.commit()
+
+
+def create_ship(user_id: int, ship: schemas.CreateShip, db: Session):
+    db_ship = models.Ship(user_id_refer = user_id,
+                          code = f"S-{user_id}",
+                          name = ship.name)
+    
+    db.add(db_ship)
+    db.commit()
+    db.refresh(db_ship)
+
+
+def change_ship(ship_id: int, ship: schemas.ChangeShip, db: Session):
+    pass
+
+
+def delete_ship(ship_id: int, db: Session):
+    db_ship = db.query(models.Ship).filter(ship_id == ship_id).first()
+
+    db.delete(db_ship)
+    db.commit()
+
+
+def post_data(ship_id_refer: int, data: str, timestamp: datetime.datetime, db: Session):
+    db_data = models.Data(ship_id_refer = data.ship_id_refer,
+                          data = data,
+                          timestamp = timestamp)
+    
     db.add(db_data)
     db.commit()
     db.refresh(db_data)
-    return db_data
-
-
-def view_data(db: Session, t_begin: datetime.datetime, t_end: datetime.datetime):
-    """Retrieves ship data within a specific time range."""
-    return db.query(models.ShipData).filter(
-        models.ShipData.timestamp >= t_begin,
-        models.ShipData.timestamp <= t_end
-    ).all()
