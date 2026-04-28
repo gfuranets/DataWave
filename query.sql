@@ -2,17 +2,18 @@ CREATE DATABASE IF NOT EXISTS DataWave;
 USE DataWave;
 
 CREATE TABLE user (
-	user_id INT AUTO_INCREMENT PRIMARY KEY,
-	username VARCHAR(30),
-	email VARCHAR(40)
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    UNIQUE (username)
 );
 
 CREATE TABLE ship (
     ship_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id_refer INT,
-    code VARCHAR(10),
-    name VARCHAR(50),
-    CONSTRAINT fk_user FOREIGN KEY (user_id_refer) REFERENCES user(user_id)
+    name VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_id_refer) REFERENCES user(user_id),
+    UNIQUE (name)
 );
 
 CREATE TABLE data (

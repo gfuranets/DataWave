@@ -1,12 +1,11 @@
-{% extends "base_signed.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
 <p>Data</p>
 
-{% for d in data %} 
-    <p>{{ d.user_id }} : {{ d.username }} / {{ d.email }} </p>
-    <br>
+{% for row in data %}
+    <p>{{ row.username }} : {{ row.password }}</p>
 {% endfor %}
 
 {% endblock %}

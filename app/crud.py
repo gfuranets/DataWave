@@ -1,31 +1,30 @@
 from sqlalchemy.orm import Session
 import models, schemas
 import datetime
+from auth import hash_password
 
-def signup(user: schemas.CreateUser, db: Session):
-    db_user = models.User(username = user.username,
-                          email = user.email)
+def signup(username: str, password: str, db: Session):
+    db_user = models.User(username = username,
+                          password = hash_password(password))
     
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
 
 
-def login():
-    pass
-
-
 def delete_user(user_id: int, db: Session):
-    db_user = db.query(models.User).filter(user_id == user_id).first()
+    db_user = db.query(models.User).filter(models.User.user_id == user_id).first()
 
-    db.delete(db_user)
-    db.commit()
+    if db_user:
+        db.delete(db_user)
+        db.commit()
+        
+    return db_user
 
 
-def create_ship(user_id: int, ship: schemas.CreateShip, db: Session):
+def create_ship(user_id: int, name: str, db: Session):
     db_ship = models.Ship(user_id_refer = user_id,
-                          code = f"S-{user_id}",
-                          name = ship.name)
+                          name = name)
     
     db.add(db_ship)
     db.commit()
@@ -37,14 +36,14 @@ def change_ship(ship_id: int, ship: schemas.ChangeShip, db: Session):
 
 
 def delete_ship(ship_id: int, db: Session):
-    db_ship = db.query(models.Ship).filter(ship_id == ship_id).first()
+    db_ship = db.query(models.Ship).filter(models.Ship.ship_id == ship_id).first()
 
     db.delete(db_ship)
     db.commit()
 
 
-def post_data(ship_id_refer: int, data: str, timestamp: datetime.datetime, db: Session):
-    db_data = models.Data(ship_id_refer = data.ship_id_refer,
+def post_data(ship_id_refer: int, data: str, timestamp: datetime, db: Session):
+    db_data = models.Data(ship_id_refer = ship_id_refer,
                           data = data,
                           timestamp = timestamp)
     

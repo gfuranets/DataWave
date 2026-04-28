@@ -1,21 +1,24 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-
 class CreateUser(BaseModel):
     username: str
-    email: str
+    password: str
 
 
 class ChangeUser(BaseModel):
     username: str | None = None
-    email: str | None = None
+    password: str | None = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 class CreateShip(BaseModel):
-    user_id_refer: int
+    # user_id_refer found from token
     name: str
-
 
 class ChangeShip(BaseModel):
     user_id_refer: int | None = None

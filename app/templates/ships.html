@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form action="/ships/create" method="post">
+    <input name="name" placeholder="name">
+    <button type="submit">Add</button>
+</form>
+
+{% for ship in ships %}
+    <p>{{ ship.ship_id }} : {{ ship.name }}, {{ ship.user_id_refer }}</p>
+{% endfor %}
+
+{% endblock %}
