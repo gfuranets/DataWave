@@ -184,7 +184,7 @@ async def delete_ship(ship_id: int, db: Session = Depends(get_db)):
 manager = ConnectionManager()
 
 
-@app.websocket('/wss')
+@app.websocket('/ws')
 async def echo(websocket: WebSocket, 
                user: models.User = Depends(get_current_user),
                db: Session = Depends(get_db)):
@@ -196,17 +196,11 @@ async def echo(websocket: WebSocket,
             manager.send_command('a', websocket)
 
             # Process incoming data
-            ship_id_refer, data = manager.receive_data(websocket)
-
-            crud.post_data(ship_id_refer, data, datetime.now(), db)
+            data = manager.receive_data(websocket)
+            crud.post_data(1, data, datetime.now(), db)
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-
-# signup Y
-# login
-# change user Y
-# delete user Y
 
 # add ship Y
 # change ship Y 

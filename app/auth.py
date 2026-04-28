@@ -10,6 +10,7 @@ from models import User
 SECRET_KEY = "secretkey"
 ALGORITHM = "HS256"
 EXPIRE_TIME = 5
+PASSWORD_HASH_PREFIX = "$2b$"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
