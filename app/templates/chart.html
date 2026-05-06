@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>&#128200; Ship {{ ship_id }} &mdash; Sensor Data</h1>
+    <p>Live readings from onboard sensors</p>
+</div>
+
+<div class="chart-layout">
+
+    <!-- Left: chart -->
+    <div class="card" style="margin-bottom:0">
+        <div class="card-title">&#128202; Sensor readings</div>
+        <div class="param-select-wrap">
+            <label for="paramSelect">Parameter</label>
+            <select id="paramSelect">
+                <option value="temp">Temperature (°C)</option>
+                <option value="press">Pressure (Pa)</option>
+                <option value="hum">Humidity (%)</option>
+                <option value="x">Magnetometer X (µT)</option>
+                <option value="y">Magnetometer Y (µT)</option>
+                <option value="z">Magnetometer Z (µT)</option>
+            </select>
+        </div>
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Right: control panel -->
+    <div class="card" style="margin-bottom:0">
+        <div class="card-title">&#127918; Ship control</div>
+
+        <p class="control-status" id="controlStatus">
+            Click below to lock cursor and take control.
+        </p>
+
+        <button id="lockBtn" class="btn btn-primary" style="width:100%;justify-content:center">
+            &#127918; Take Control
+        </button>
+
+        <div class="readout" id="servoReadout">Pan: 90 &nbsp;|&nbsp; Tilt: 90 &nbsp;|&nbsp; Rudder: 90</div>
+
+        <div class="connection-badge" id="espBadge">
+            <span class="dot"></span>
+            <span id="espStatus">Connecting&hellip;</span>
+        </div>
+
+        <hr>
+
+        <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.7">
+            <strong>Mouse</strong> &mdash; Pan &amp; Tilt<br>
+            <strong>A / D keys</strong> &mdash; Rudder<br>
+            <strong>Esc</strong> &mdash; Release cursor
+        </p>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// ---- Chart ----
+let chart;
+
+async function loadData() {
+    const res = await fetch("/api/data/{{ ship_id }}");
+    const rawData = await res.json();
+
+    const timestamps = rawData.map(d => d.time);
+    const tempData = [], pressData = [], humData = [];
+    const xData = [], yData = [], zData = [];
+
+    for (let d of rawData) {
+        const parts = d.value.split(",").map(parseFloat);
+        tempData.push(parts[0]);
+        pressData.push(parts[1]);
+        humData.push(parts[2]);
+        xData.push(parts[3]);
+        yData.push(parts[4]);
+        zData.push(parts[5]);
+    }
+
+    const allDatasets = {
+        temp:  { label: "Temperature (°C)",    data: tempData,  borderColor: "#ef4444" },
+        press: { label: "Pressure (Pa)",       data: pressData, borderColor: "#3b82f6" },
+        hum:   { label: "Humidity (%)",        data: humData,   borderColor: "#10b981" },
+        x:     { label: "Magnetometer X (µT)", data: xData,     borderColor: "#f59e0b" },
+        y:     { label: "Magnetometer Y (µT)", data: yData,     borderColor: "#8b5cf6" },
+        z:     { label: "Magnetometer Z (µT)", data: zData,     borderColor: "#06b6d4" }
+    };
+
+    const ctx = document.getElementById("chart").getContext("2d");
+
+    function updateChart(param) {
+        const ds = allDatasets[param];
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: timestamps,
+                datasets: [{
+                    label: ds.label,
+                    data: ds.data,
+                    borderColor: ds.borderColor,
+                    backgroundColor: ds.borderColor + "18",
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { mode: "index", intersect: false }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: ds.label, color: "#64748b", font: { size: 11 } },
+                        grid: { color: "#dbeafe" },
+                        ticks: { color: "#64748b", font: { size: 11 } }
+                    },
+                    x: {
+                        title: { display: true, text: "Time", color: "#64748b", font: { size: 11 } },
+                        grid: { color: "#dbeafe" },
+                        ticks: { color: "#64748b", font: { size: 11 }, maxTicksLimit: 8 }
+                    }
+                }
+            }
+        });
+    }
+
+    updateChart("temp");
+    document.getElementById("paramSelect").addEventListener("change", e => updateChart(e.target.value));
+}
+
+loadData();
+
+
+// ---- Servo Control ----
+const controlWs = new WebSocket(`ws://${location.host}/ws-control/{{ ship_id }}`);
+const statusText  = document.getElementById("controlStatus");
+const espStatusEl = document.getElementById("espStatus");
+const badge       = document.getElementById("espBadge");
+const readout     = document.getElementById("servoReadout");
+
+controlWs.onopen = () => {
+    espStatusEl.textContent = "Connected";
+    badge.classList.add("connected");
+};
+controlWs.onclose = () => {
+    espStatusEl.textContent = "Disconnected";
+    badge.classList.remove("connected");
+};
+controlWs.onmessage = e => {
+    if (e.data === "ERR:ESP32_NOT_CONNECTED") {
+        espStatusEl.textContent = "ESP32 not connected";
+        badge.classList.remove("connected");
+    }
+};
+
+let servoPan = 90, servoTilt = 90, servoRudder = 90;
+const MOUSE_SENSITIVITY = 0.15;
+const KEY_STEP = 5;
+const SEND_INTERVAL = 100;
+const keysHeld = new Set();
+
+document.getElementById("lockBtn").addEventListener("click", () => {
+    document.body.requestPointerLock();
+});
+
+document.addEventListener("pointerlockchange", () => {
+    if (document.pointerLockElement) {
+        statusText.textContent = "Locked. Mouse = pan/tilt. A/D = rudder. Esc = release.";
+    } else {
+        statusText.textContent = "Released. Click button to retake control.";
+    }
+});
+
+document.addEventListener("mousemove", e => {
+    if (!document.pointerLockElement) return;
+    servoPan  = Math.max(0, Math.min(180, servoPan  + e.movementX * MOUSE_SENSITIVITY));
+    servoTilt = Math.max(0, Math.min(180, servoTilt - e.movementY * MOUSE_SENSITIVITY));
+});
+
+document.addEventListener("keydown", e => {
+    if (!document.pointerLockElement) return;
+    keysHeld.add(e.key.toLowerCase());
+});
+
+document.addEventListener("keyup", e => {
+    keysHeld.delete(e.key.toLowerCase());
+});
+
+setInterval(() => {
+    if (!document.pointerLockElement) return;
+    if (controlWs.readyState !== WebSocket.OPEN) return;
+
+    if (keysHeld.has("a")) servoRudder = Math.max(0, servoRudder - KEY_STEP);
+    if (keysHeld.has("d")) servoRudder = Math.min(180, servoRudder + KEY_STEP);
+
+    const pan    = Math.round(servoPan);
+    const tilt   = Math.round(servoTilt);
+    const rudder = Math.round(servoRudder);
+
+    readout.textContent = `Pan: ${pan}  |  Tilt: ${tilt}  |  Rudder: ${rudder}`;
+    controlWs.send(`SX:${pan},SY:${tilt},SZ:${rudder}`);
+}, SEND_INTERVAL);
+</script>
+
+{% endblock %}

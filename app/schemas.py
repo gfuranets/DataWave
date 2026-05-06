@@ -19,7 +19,7 @@ class Token(BaseModel):
 class CreateShip(BaseModel):
     # user_id_refer found from token
     name: str
-
+        
 class ChangeShip(BaseModel):
     user_id_refer: int | None = None
     name: str | None = None

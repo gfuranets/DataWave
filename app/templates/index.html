@@ -1,13 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Home</h1>
 
-{% if user %}
-    <p>Welcome, {{ user.username }}</p>
-    <a href="/data">Data</a>
-{% else %}
-    <a href="/signup">Signup</a>
-{% endif %}
+<div class="hero">
+    <div class="hero-badge">&#127754; Live Monitoring</div>
+    <h1>Welcome back{% if user %}, {{ user.username }}{% endif %}</h1>
+    <p>Monitor your fleet's sensor data in real time from anywhere.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Platform</div>
+        <div class="stat-value">DataWave</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Coverage</div>
+        <div class="stat-value">Rivers &amp; Seas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Access</div>
+        <div class="stat-value">Any Device</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">&#128640; Quick navigation</div>
+    <a href="{{ url_for('ships_page') }}" class="btn btn-primary">View my ships</a>
+</div>
 
 {% endblock %}

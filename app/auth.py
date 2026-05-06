@@ -9,7 +9,7 @@ from models import User
 
 SECRET_KEY = "secretkey"
 ALGORITHM = "HS256"
-EXPIRE_TIME = 5
+EXPIRE_TIME = 10
 PASSWORD_HASH_PREFIX = "$2b$"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,7 +25,7 @@ def verify_password(plain, hashed):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(minutes=EXPIRE_TIME)
+    expire = datetime.now(timezone.utc) + timedelta(hours=EXPIRE_TIME)
     to_encode.update({
         "exp": expire,
         "iat": datetime.now(timezone.utc)

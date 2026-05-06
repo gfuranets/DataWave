@@ -12,14 +12,16 @@ CREATE TABLE ship (
     ship_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id_refer INT,
     name VARCHAR(50) NOT NULL,
+    token VARCHAR(255),
     CONSTRAINT fk_user FOREIGN KEY (user_id_refer) REFERENCES user(user_id),
-    UNIQUE (name)
+    UNIQUE (name),
+    UNIQUE (token)
 );
 
 CREATE TABLE data (
     data_id INT AUTO_INCREMENT PRIMARY KEY,
     ship_id_refer INT,
-    data VARCHAR(40),
+    data VARCHAR(255),
     timestamp DATETIME,
     CONSTRAINT fk_ship FOREIGN KEY (ship_id_refer) REFERENCES ship(ship_id)
 );

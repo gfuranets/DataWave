@@ -2,26 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title or "Minimal Dashboard" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or "DataWave" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
 </head>
 <body>
 
 <header>
-    <div class="logo">
-        <strong>MyApp</strong>
-    </div>
+    <a href="{{ url_for('index') }}" class="brand">
+        <div class="brand-icon">&#9875;</div>
+        DataWave
+    </a>
     <nav>
         <a href="{{ url_for('index') }}">Home</a>
-        <a href="{{ url_for('data') }}">Data</a>
-        <a href="{{ url_for('ships') }}">Ships</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('ships_page') }}">Ships</a>
+        <a href="{{ url_for('logout') }}" class="nav-logout">Logout</a>
     </nav>
 </header>
 
-<div class="container">
+<main>
     {% block content %}{% endblock %}
-</div>
+</main>
+
+<footer>
+    <span class="footer-brand">DataWave</span>
+    <span>Real-time water monitoring &mdash; rivers, lakes &amp; seas</span>
+</footer>
 
 </body>
 </html>

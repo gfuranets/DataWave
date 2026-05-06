@@ -2,13 +2,39 @@
 
 {% block content %}
 
-<form action="/ships/create" method="post">
-    <input name="name" placeholder="name">
-    <button type="submit">Add</button>
-</form>
+<div class="page-header">
+    <h1>&#9875; Ships</h1>
+    <p>Manage your monitored vessels</p>
+</div>
 
-{% for ship in ships %}
-    <p>{{ ship.ship_id }} : {{ ship.name }}, {{ ship.user_id_refer }}</p>
-{% endfor %}
+<div class="card">
+    <div class="card-title">&#43; Add a ship</div>
+    <form action="/ships/create" method="post" class="add-row">
+        <div class="form-group">
+            <input name="name" type="text" placeholder="Ship name">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-bottom:1rem">Add ship</button>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-title">&#128674; Your fleet</div>
+    {% if ships %}
+        {% for ship in ships %}
+        <div class="ship-item">
+            <div class="ship-info">
+                <div class="ship-avatar">&#9875;</div>
+                <div>
+                    <div class="ship-name">{{ ship.name }}</div>
+                    <div class="ship-id">ID &num;{{ ship.ship_id }}</div>
+                </div>
+            </div>
+            <a href="/chart/{{ ship.ship_id }}" class="btn btn-secondary btn-sm">View data &#8594;</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="color:var(--text-muted);font-size:0.9rem">No ships yet. Add one above to get started.</p>
+    {% endif %}
+</div>
 
 {% endblock %}

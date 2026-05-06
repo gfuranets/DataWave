@@ -1,13 +1,27 @@
 {% extends "base_guest.html" %}
 
 {% block content %}
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="brand-icon">&#9875;</div>
+            <h1>Create account</h1>
+            <p class="auth-sub">Start monitoring your fleet today</p>
+        </div>
 
-<p>Signup</p>
+        <form action="/signup" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" placeholder="your_username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:0.25rem">Create account</button>
+        </form>
 
-<form action="/signup" method="post">
-    <input name="username">
-    <input name="password">
-    <button type="submit">Sign up</button>
-</form>
-
+        <p class="auth-footer">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
+    </div>
+</div>
 {% endblock %}
